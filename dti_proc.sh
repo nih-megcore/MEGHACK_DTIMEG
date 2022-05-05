@@ -14,4 +14,8 @@ DWI_r1=${bids_dir}/${subjid}/ses-01/dwi/${subjid}_ses-01_run-01_dwi.nii.gz
 DWI_r2=${bids_dir}/${subjid}/ses-01/dwi/${subjid}_ses-01_run-02_dwi.nii.gz
 
 #Copy T1 and T2 into reg folder
-#3dcopy 
+regpath=/tmp/regT1T2
+mkdir ${regpath}
+3dcopy ${T1path} ${regpath}
+3dcopy ${T2path} ${regpath}
+
