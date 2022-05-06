@@ -6,6 +6,7 @@ import numpy as np
 import nibabel as nb
 import mne
 mne.set_log_level('warning')
+from scipy.stats import zscore
 
 
 def read_fif(fpath):
@@ -105,8 +106,8 @@ def concatenate_subjs(subjs, data_dir):
 
     for subj in subjs:
 
-        meg_path = data_dir / (subj + "_ses-01_task-haririhammer_ave.fif")
-        fa_path = data_dir / (subj + "_FA_tlrc.nii")
+        meg_path = data_dir / "meg_ave" / (subj + "_ses-01_task-haririhammer_ave.fif")
+        fa_path = data_dir / "dti_blur10mm" / (subj + "_FA_tlrc_blur10mm.nii")
 
         if (not meg_path.exists) or (not fa_path.exists):
             print(f"{subj} does not have both MEG and FA files. Skipping...")
@@ -135,6 +136,23 @@ def concatenate_subjs(subjs, data_dir):
     out_lfp = np.reshape(master_lfp_arr, (n_subjs, -1))
 
     return out_fa, out_lfp
+
+def normalize_modality(modality_arr,
+                       axis=None):
+    """Normalize modality across subjects
+
+    Args:
+        modality_arr (np.array): modality array of shape (n_subjs, n_feats)
+        axis (int or None): axis to normalize array
+
+    Returns:
+        np.array: normalized array
+    """
+
+    norm_arr = zscore(modality_arr, axis=axis)
+    norm_arr[np.isnan(norm_arr)] = 0
+
+    return norm_arr
 
 def concatenate_modalities(fa, lfp):
     """Concatenate FA values and LFP values.
