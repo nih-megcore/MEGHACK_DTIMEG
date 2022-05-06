@@ -15,7 +15,7 @@ def read_fif(fpath):
         fpath (str): path to .fif file
 
     Returns:
-        mne.evoked.Evoked: _description_
+        mne.evoked.Evoked: meg evoked potentials
     """
 
     ave=mne.read_evokeds(fpath, verbose=False)
@@ -27,7 +27,7 @@ def get_regions(ave):
     """Retrieve list of regions for specifying vector order.
 
     Args:
-        ave (mne.evoked.Evoked): _description_
+        ave (mne.evoked.Evoked): meg evoked potentials
 
     Returns:
         list: list of regions
@@ -40,7 +40,7 @@ def compute_lfp_vector(order, ave):
 
     Args:
         order (list): order of channel regions
-        ave (mne.evoked.Evoked): _description_
+        ave (mne.evoked.Evoked): meg evoked potentials
 
     Returns:
         np.array: 1D vector of LFPs in order
