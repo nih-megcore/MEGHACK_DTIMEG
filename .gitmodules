@@ -1,0 +1,3 @@
+[submodule "DTI-Scripts"]
+	path = DTI-Scripts
+	url = https://github.com/jstout211/DTI-Scripts
