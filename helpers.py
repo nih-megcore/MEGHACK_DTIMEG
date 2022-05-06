@@ -92,8 +92,8 @@ def concatenate_subjs(subjs, data_dir):
         data_dir (posix.Path): path to data directory
 
     Returns:
-        tuple: np.array of all FA values (n_voxels, n_subjs) ,
-               np.array of all LFP values (n_timepoints*n_regions, n_subjs)
+        tuple: np.array of all FA values (n_subjs, n_voxels) ,
+               np.array of all LFP values (n_subjs, n_timepoints*n_regions)
     """
 
     assert type(data_dir) == PosixPath
@@ -135,3 +135,16 @@ def concatenate_subjs(subjs, data_dir):
     out_lfp = np.reshape(master_lfp_arr, (n_subjs, -1))
 
     return out_fa, out_lfp
+
+def concatenate_modalities(fa, lfp):
+    """Concatenate FA values and LFP values.
+
+    Args:
+        fa (np.array): fa values (n_subjs, n_voxels)
+        lfp (np.array): lfp values (n_subjs, n_timepoints*n_regions)
+
+    Returns:
+        np.array: input array for jICA (n_subjs, n_features)
+    """
+
+    return np.hstack((fa, lfp))
