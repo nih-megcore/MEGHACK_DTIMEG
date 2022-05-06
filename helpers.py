@@ -1,8 +1,12 @@
 #!/usr/env python
 
+from pathlib import Path, PosixPath
+
 import numpy as np
 import nibabel as nb
 import mne
+mne.set_log_level('warning')
+
 
 def read_fif(fpath):
     """Return mne.evoked.Evoked structure given a fpath.
@@ -14,7 +18,7 @@ def read_fif(fpath):
         mne.evoked.Evoked: _description_
     """
 
-    ave=mne.read_evokeds(fpath)
+    ave=mne.read_evokeds(fpath, verbose=False)
     ave=ave[0]
     ave.pick_types(meg=True, ref_meg=False)
     return ave
@@ -79,3 +83,55 @@ def read_fa_map(fpath):
     img = nb.load(fpath)
     data = img.get_fdata()
     return np.reshape(data, data.size)
+
+def concatenate_subjs(subjs, data_dir):
+    """Retrieve and merge subject LFP and FA vectors.
+
+    Args:
+        subjs (list): list of subjects
+        data_dir (posix.Path): path to data directory
+
+    Returns:
+        tuple: np.array of all FA values (n_voxels, n_subjs) ,
+               np.array of all LFP values (n_timepoints*n_regions, n_subjs)
+    """
+
+    assert type(data_dir) == PosixPath
+    assert type(subjs) == list
+
+    master_fa_arr = np.array(())
+    master_lfp_arr = np.array(())
+    n_subjs = 0; first_subj = True
+
+    for subj in subjs:
+
+        meg_path = data_dir / (subj + "_ses-01_task-haririhammer_ave.fif")
+        fa_path = data_dir / (subj + "_FA_tlrc.nii")
+
+        if (not meg_path.exists) or (not fa_path.exists):
+            print(f"{subj} does not have both MEG and FA files. Skipping...")
+            continue
+        else:
+            n_subjs += 1
+
+        # retrieve MEG data
+        ave = read_fif(meg_path)
+
+        # use first subject's region order as standard across subjects
+        if first_subj:
+            order = get_regions(ave)
+            first_subj = False
+
+        lfp_vector = compute_lfp_vector(order, ave)
+
+        # retrieve FA data
+        fa_vector = read_fa_map(fa_path)
+
+        # merge arrays
+        master_fa_arr = np.hstack((master_fa_arr, fa_vector))
+        master_lfp_arr = np.hstack((master_lfp_arr, lfp_vector))
+
+    out_fa = np.reshape(master_fa_arr, (n_subjs, -1)).T
+    out_lfp = np.reshape(master_lfp_arr, (n_subjs, -1)).T
+
+    return out_fa, out_lfp
