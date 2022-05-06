@@ -1,6 +1,6 @@
 #!/usr/env python
 
-from pathlib import Path, PosixPath
+from pathlib import PosixPath
 
 import numpy as np
 import nibabel as nb
@@ -131,7 +131,7 @@ def concatenate_subjs(subjs, data_dir):
         master_fa_arr = np.hstack((master_fa_arr, fa_vector))
         master_lfp_arr = np.hstack((master_lfp_arr, lfp_vector))
 
-    out_fa = np.reshape(master_fa_arr, (n_subjs, -1)).T
-    out_lfp = np.reshape(master_lfp_arr, (n_subjs, -1)).T
+    out_fa = np.reshape(master_fa_arr, (n_subjs, -1))
+    out_lfp = np.reshape(master_lfp_arr, (n_subjs, -1))
 
     return out_fa, out_lfp
