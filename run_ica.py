@@ -10,7 +10,7 @@ from helpers import *
 # get list of subjects
 subjs_dir = Path("/data/NIMH_scratch/MEG_Hackathon/hv_bids")
 fpath = subjs_dir / "subjects.txt"
-subjs_arr = np.loadtxt(fpath)
+subjs_arr = np.loadtxt(fpath, dtype=str)
 subjs = list(subjs_arr)
 
 data_dir = Path("/data/NIMH_scratch/MEG_Hackathon/DTI_MEG")
@@ -21,7 +21,7 @@ norm_lfp = normalize_modality(lfp, axis=None)
 
 final_mat = concatenate_modalities(norm_fa, norm_lfp)
 
-ica_model = FastICA(n_components=11)
+ica_model = FastICA(n_components=11, random_state=0)
 fit_components = ica_model.fit_transform(final_mat.T)
 
 opath = data_dir / "ica_11components.npy"

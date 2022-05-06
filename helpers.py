@@ -109,7 +109,7 @@ def concatenate_subjs(subjs, data_dir):
         meg_path = data_dir / "meg_ave" / (subj + "_ses-01_task-haririhammer_ave.fif")
         fa_path = data_dir / "dti_blur10mm" / (subj + "_FA_tlrc_blur10mm.nii")
 
-        if (not meg_path.exists) or (not fa_path.exists):
+        if (not meg_path.exists()) or (not fa_path.exists()):
             print(f"{subj} does not have both MEG and FA files. Skipping...")
             continue
         else:
